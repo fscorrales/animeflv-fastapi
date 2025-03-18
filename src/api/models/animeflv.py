@@ -1,5 +1,6 @@
-__all__ = ["AnimeInfo", "EpisodeInfo"]
+__all__ = ["AnimeInfo", "EpisodeInfo", "EpisodeFormat", "DownloadLinkInfo"]
 
+from enum import Flag, auto
 from typing import List, Optional, Union
 
 from pydantic import BaseModel
@@ -24,3 +25,13 @@ class AnimeInfo(BaseModel):
     debut: Optional[str] = None
     type: Optional[str] = None
     episodes: Optional[List[EpisodeInfo]] = None
+
+
+class EpisodeFormat(Flag):
+    Subtitled = auto()
+    Dubbed = auto()
+
+
+class DownloadLinkInfo(BaseModel):
+    server: str
+    url: str

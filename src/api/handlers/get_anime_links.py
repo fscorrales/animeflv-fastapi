@@ -2,18 +2,20 @@
 """
 Author : Fernando Corrales <fscpython@gmail.com>
 Date   : 18-mar-2025
-Purpose: Try get_anime_info in AnimeFlv API
+Purpose: Try get_anime_links in AnimeFlv API
 Source : https://github.com/jorgeajimenezl/animeflv-api
 """
 
 import argparse
-import json
+import re
+from typing import List, Union
+from urllib.parse import unquote
 
 from bs4 import BeautifulSoup
 
-from ..config import ANIME_URL, BASE_EPISODE_IMG_URL, BASE_URL
-from ..models import AnimeInfo, EpisodeInfo
-from ..utils import AnimeFLVParseError
+from ..config import ANIME_VIDEO_URL
+from ..models import DownloadLinkInfo, EpisodeFormat
+from ..utils import AnimeFLVParseError, parse_table
 from .connect import AnimeFLV
 
 
@@ -23,9 +25,14 @@ def get_args():
 
     parser = argparse.ArgumentParser(
         description="""
-        Función de búsqueda para la API de AnimeFlv. 
-        Permite buscar series de anime en el sitio web de AnimeFlv y devuelve 
-        los resultados en forma de lista de elementos
+            Retrieves download links for a specific anime episode from AnimeFLV.
+
+            This script takes an anime ID and an episode number as input, 
+            and returns a list of download links for that episode.
+
+            Example usage:
+                python -m src.api.handlers.get_anime_links one-piece-tv -e 10
+                python -m src.api.handlers.get_anime_links dragon-ball-z -e 5
         """,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
@@ -38,94 +45,75 @@ def get_args():
         default="",
     )
 
+    parser.add_argument(
+        "-e",
+        "--episode",
+        help="Episode id, like as '1'",
+        metavar="int",
+        type=int,
+        default=1,
+    )
+
     return parser.parse_args()
 
 
 # --------------------------------------------------
-def get_anime_info(id: str, animeflv: AnimeFLV) -> AnimeInfo:
+def get_links(
+    id: str,
+    episode: Union[str, int],
+    format: EpisodeFormat = EpisodeFormat.Subtitled,
+    animeflv: AnimeFLV = None,
+    **kwargs,
+) -> List[DownloadLinkInfo]:
     """
-    Get information about specific anime.
-    Return a dictionary.
+    Get download links of specific episode.
+    Return a list of dictionaries like:
+    [
+        {
+            "server": "...",
+            "url": "..."
+        },
+        ...
+    ]
 
     :param id: Anime id, like as 'nanatsu-no-taizai'.
-    :rtype: dict
+    :param episode: Episode id, like as '1'.
+    :param **kwargs: Optional arguments for filter output (see doc).
+    :rtype: list
     """
 
     if animeflv is None:
         animeflv = AnimeFLV()
 
-    response = animeflv._scraper.get(f"{ANIME_URL}/{id}")
+    response = animeflv._scraper.get(f"{ANIME_VIDEO_URL}{id}-{episode}")
     soup = BeautifulSoup(response.text, "lxml")
-
-    synopsis = soup.select_one(
-        "body div div div div div main section div.Description p"
-    ).string
-
-    information = {
-        "title": soup.select_one(
-            "body div.Wrapper div.Body div div.Ficha.fchlt div.Container h1.Title"
-        ).string,
-        "poster": BASE_URL
-        + "/"
-        + soup.select_one(
-            "body div div div div div aside div.AnimeCover div.Image figure img"
-        ).get("src", ""),
-        "synopsis": synopsis.strip() if synopsis else None,
-        "rating": soup.select_one(
-            "body div div div.Ficha.fchlt div.Container div.vtshr div.Votes span#votes_prmd"
-        ).string,
-        "debut": soup.select_one(
-            "body div.Wrapper div.Body div div.Container div.BX.Row.BFluid.Sp20 aside.SidebarA.BFixed p.AnmStts"
-        ).string,
-        "type": soup.select_one(
-            "body div.Wrapper div.Body div div.Ficha.fchlt div.Container span.Type"
-        ).string,
-    }
-    information["banner"] = information["poster"].replace("covers", "banners").strip()
-    genres = []
-
-    for element in soup.select("main.Main section.WdgtCn nav.Nvgnrs a"):
-        if "=" in element["href"]:
-            genres.append(element["href"].split("=")[1])
-
-    info_ids = []
-    episodes_data = []
-    episodes = []
+    table = soup.find("table", attrs={"class": "RTbl"})
 
     try:
-        for script in soup.find_all("script"):
-            contents = str(script)
+        rows = parse_table(table)
+        ret = []
 
-            if "var anime_info = [" in contents:
-                anime_info = contents.split("var anime_info = ")[1].split(";")[0]
-                info_ids.append(json.loads(anime_info))
-
-            if "var episodes = [" in contents:
-                data = contents.split("var episodes = ")[1].split(";")[0]
-                episodes_data.extend(json.loads(data))
-
-        AnimeThumbnailsId = info_ids[0][0]
-        # animeId = info_ids[0][2]
-        # nextEpisodeDate = info_ids[0][3] if len(info_ids[0]) > 4 else None
-
-        for episode, _ in episodes_data:
-            episodes.append(
-                EpisodeInfo(
-                    id=episode,
-                    anime=id,
-                    image_preview=f"{BASE_EPISODE_IMG_URL}{AnimeThumbnailsId}/{episode}/th_3.jpg",
+        for row in rows:
+            if (
+                row["FORMATO"].string == "SUB"
+                and EpisodeFormat.Subtitled in format
+                or row["FORMATO"].string == "LAT"
+                and EpisodeFormat.Dubbed in format
+            ):
+                ret.append(
+                    DownloadLinkInfo(
+                        server=row["SERVIDOR"].string,
+                        url=re.sub(
+                            r"^http[s]?://ouo.io/[A-Za-z0-9]+/[A-Za-z0-9]+\?[A-Za-z0-9]+=",
+                            "",
+                            unquote(row["DESCARGAR"].a["href"]),
+                        ),
+                    )
                 )
-            )
 
+        return ret
     except Exception as exc:
         raise AnimeFLVParseError(exc)
-
-    return AnimeInfo(
-        id=id,
-        episodes=episodes,
-        genres=genres,
-        **information,
-    )
 
 
 # --------------------------------------------------
@@ -136,17 +124,9 @@ def main():
 
     with AnimeFLV() as api:
         try:
-            anime = get_anime_info(args.anime_id, animeflv=api)
-            print(f"Título: {anime.title}")
-            print(f"Sinopsis: {anime.synopsis}")
-            print(f"Tipo: {anime.type}")
-            generos_string = ", ".join(anime.genres)
-            print(f"Generos: {generos_string}")
-            print(f"Debut: {anime.debut}")
-            print(f"Rating: {anime.rating}")
-            anime.episodes.reverse()
-            for j, episode in enumerate(anime.episodes):
-                print(f"{j}, | Episode - {episode.id}")
+            results = get_links(args.anime_id, str(args.episode), animeflv=api)
+            for result in results:
+                print(f"{result.server} - {result.url}")
         except Exception as e:
             print(e)
 
@@ -155,5 +135,5 @@ def main():
 if __name__ == "__main__":
     main()
 
-    # python -m src.api.handlers.get_anime_info one-piece-tv
-    # python -m src.api.handlers.get_anime_info dragon-ball-z
+    # python -m src.api.handlers.get_anime_links one-piece-tv -e 10
+    # python -m src.api.handlers.get_anime_links dragon-ball-z
