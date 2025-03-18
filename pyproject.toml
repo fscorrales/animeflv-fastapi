@@ -5,6 +5,7 @@ description = "animeflv-fastapi: FastAPI version of animeflv-api for animeflv.ne
 authors = ["Fernando Corrales <fscpython@gmail.com>"]
 license = "MIT"
 readme = "README.md"
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.12"
