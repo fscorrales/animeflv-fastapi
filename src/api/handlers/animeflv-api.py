@@ -33,7 +33,7 @@ def main():
     with AnimeFLV() as api:
         elements = api.search(input("Serie to search: "))
         for i, element in enumerate(elements):
-            print(f"{i}, {element.title}")
+            print(f"{i}, id: {element.id}, title: {element.title}")
         try:
             selection = int(input("Select option: "))
             info = api.get_anime_info(elements[selection])

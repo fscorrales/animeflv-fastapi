@@ -1,13 +1,16 @@
 __all__ = ["AnimeInfo", "EpisodeInfo"]
 
 from typing import List, Optional, Union
+
 from pydantic import BaseModel
+
 
 # --------------------------------------------------
 class EpisodeInfo(BaseModel):
     id: Union[str, int]
     anime: str
     image_preview: Optional[str] = None
+
 
 # --------------------------------------------------
 class AnimeInfo(BaseModel):

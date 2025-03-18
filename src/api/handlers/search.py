@@ -84,27 +84,17 @@ def main():
     args = get_args()
 
     with AnimeFLV() as api:
-        elements = search(args.title, animeflv=api)
-        for i, element in enumerate(elements):
-            print(f"{i}, {element.title}")
-        # try:
-        #     selection = int(input('Select option: '))
-        #     info = api.get_anime_info(elements[selection])
-        #     info.episodes.reverse()
-        #     for j, episode in enumerate(info.episodes):
-        #         print(f'{j}, | Episode - {episode.id} - {episode.url}')
-        #     index_episode = int(input('Select episode: '))
-        #     serie = elements[selection].id
-        #     capitulo = info.episodes[index_episode].id
-        #     results = api.get_links(serie, capitulo)
-        #     for result in results:
-        #         print(f"{result.server} - {result.url}")
-        # except Exception as e:
-        #     print(e)
+        try:
+            elements = search(args.title, animeflv=api)
+            for i, element in enumerate(elements):
+                print(f"{i}, id: {element.id}, title: {element.title}")
+        except Exception as e:
+            print(e)
 
 
 # --------------------------------------------------
 if __name__ == "__main__":
     main()
 
-    # python -m src.api.handlers.search
+    # python -m src.api.handlers.search "Dragon Ball Z"
+    # python -m src.api.handlers.search "One Piece"
