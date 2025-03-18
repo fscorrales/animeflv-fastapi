@@ -23,9 +23,7 @@ def get_args():
 
     parser = argparse.ArgumentParser(
         description="""
-        Función de búsqueda para la API de AnimeFlv. 
-        Permite buscar series de anime en el sitio web de AnimeFlv y devuelve 
-        los resultados en forma de lista de elementos
+        Obtiene información sobre un anime específico desde la API de AnimeFLV.
         """,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
