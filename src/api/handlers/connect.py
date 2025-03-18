@@ -1,9 +1,11 @@
 __all__ = ["AnimeFLV"]
 
-from typing import Optional, Type
 from types import TracebackType
-import cloudscraper
+from typing import Optional, Type
+
 import certifi
+import cloudscraper
+
 
 # --------------------------------------------------
 class AnimeFLV(object):

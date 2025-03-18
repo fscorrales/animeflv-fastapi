@@ -7,23 +7,28 @@ Source : https://github.com/jorgeajimenezl/animeflv-api
 """
 
 import argparse
-from ..models import AnimeInfo
-from ..config import BROWSE_URL
-from bs4 import BeautifulSoup, ResultSet
-from urllib.parse import urlencode
 from typing import List
+from urllib.parse import urlencode
+
+from bs4 import BeautifulSoup, ResultSet
+
+from ..config import BROWSE_URL
+from ..models import AnimeInfo
+from ..utils import AnimeFLVParseError, removeprefix
 from .connect import AnimeFLV
-from ..utils import AnimeFLVParseError
+
 
 # --------------------------------------------------
 def get_args():
     """Get command-line arguments"""
 
     parser = argparse.ArgumentParser(
-        description='Try AnimeFlv API',
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+        description="Try AnimeFlv API",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
 
     return parser.parse_args()
+
 
 # --------------------------------------------------
 def process_anime_list_info(elements: ResultSet) -> List[AnimeInfo]:
@@ -39,15 +44,11 @@ def process_anime_list_info(elements: ResultSet) -> List[AnimeInfo]:
                     ),
                     title=element.select_one("a h3").string,
                     poster=(
-                        element.select_one("a div.Image figure img").get(
-                            "src", None
-                        )
+                        element.select_one("a div.Image figure img").get("src", None)
                         or element.select_one("a div.Image figure img")["data-cfsrc"]
                     ),
                     banner=(
-                        element.select_one("a div.Image figure img").get(
-                            "src", None
-                        )
+                        element.select_one("a div.Image figure img").get("src", None)
                         or element.select_one("a div.Image figure img")["data-cfsrc"]
                     )
                     .replace("covers", "banners")
@@ -71,8 +72,11 @@ def process_anime_list_info(elements: ResultSet) -> List[AnimeInfo]:
 
     return ret
 
+
 # --------------------------------------------------
-def search(query: str = None, page: int = None, animeflv: AnimeFLV = None) -> List[AnimeInfo]:
+def search(
+    query: str = None, page: int = None, animeflv: AnimeFLV = None
+) -> List[AnimeInfo]:
     """
     Search in animeflv.net by query.
     :param query: Query information like: 'Nanatsu no Taizai'.
@@ -115,9 +119,9 @@ def main():
     # args = get_args()
 
     with AnimeFLV() as api:
-        elements = search(input('Serie to search: '), animeflv=api)
+        elements = search(input("Serie to search: "), animeflv=api)
         for i, element in enumerate(elements):
-            print(f'{i}, {element.title} - {element.url}')
+            print(f"{i}, {element.title}")
         # try:
         #     selection = int(input('Select option: '))
         #     info = api.get_anime_info(elements[selection])
@@ -132,10 +136,10 @@ def main():
         #         print(f"{result.server} - {result.url}")
         # except Exception as e:
         #     print(e)
-        
+
 
 # --------------------------------------------------
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
 
     # python -m src.api.handlers.search
