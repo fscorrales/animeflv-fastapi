@@ -2,7 +2,7 @@
 """
 Author : Fernando Corrales <fscpython@gmail.com>
 Date   : 18-mar-2025
-Purpose: Try AnimeFlv API
+Purpose: Try search in AnimeFlv API
 Source : https://github.com/jorgeajimenezl/animeflv-api
 """
 
@@ -10,11 +10,11 @@ import argparse
 from typing import List
 from urllib.parse import urlencode
 
-from bs4 import BeautifulSoup, ResultSet
+from bs4 import BeautifulSoup
 
 from ..config import BROWSE_URL
 from ..models import AnimeInfo
-from ..utils import AnimeFLVParseError, removeprefix
+from ..utils import AnimeFLVParseError, process_anime_list_info
 from .connect import AnimeFLV
 
 
@@ -23,54 +23,19 @@ def get_args():
     """Get command-line arguments"""
 
     parser = argparse.ArgumentParser(
-        description="Try AnimeFlv API",
+        description="""
+        Función de búsqueda para la API de AnimeFlv. 
+        Permite buscar series de anime en el sitio web de AnimeFlv y devuelve 
+        los resultados en forma de lista de elementos
+        """,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
 
+    parser.add_argument(
+        "title", metavar="str", help="Anime's title to search", type=str, default=""
+    )
+
     return parser.parse_args()
-
-
-# --------------------------------------------------
-def process_anime_list_info(elements: ResultSet) -> List[AnimeInfo]:
-    ret = []
-
-    for element in elements:
-        try:
-            ret.append(
-                AnimeInfo(
-                    id=removeprefix(
-                        element.select_one("div.Description a.Button")["href"][1:],
-                        "anime/",
-                    ),
-                    title=element.select_one("a h3").string,
-                    poster=(
-                        element.select_one("a div.Image figure img").get("src", None)
-                        or element.select_one("a div.Image figure img")["data-cfsrc"]
-                    ),
-                    banner=(
-                        element.select_one("a div.Image figure img").get("src", None)
-                        or element.select_one("a div.Image figure img")["data-cfsrc"]
-                    )
-                    .replace("covers", "banners")
-                    .strip(),
-                    type=element.select_one("div.Description p span.Type").string,
-                    synopsis=(
-                        element.select("div.Description p")[1].string.strip()
-                        if element.select("div.Description p")[1].string
-                        else None
-                    ),
-                    rating=element.select_one("div.Description p span.Vts").string,
-                    debut=(
-                        element.select_one("a span.Estreno").string.lower()
-                        if element.select_one("a span.Estreno")
-                        else None
-                    ),
-                )
-            )
-        except Exception as exc:
-            raise AnimeFLVParseError(exc)
-
-    return ret
 
 
 # --------------------------------------------------
@@ -116,10 +81,10 @@ def search(
 def main():
     """Make a jazz noise here"""
 
-    # args = get_args()
+    args = get_args()
 
     with AnimeFLV() as api:
-        elements = search(input("Serie to search: "), animeflv=api)
+        elements = search(args.title, animeflv=api)
         for i, element in enumerate(elements):
             print(f"{i}, {element.title}")
         # try:
