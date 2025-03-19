@@ -1,7 +1,9 @@
 __all__ = ["wrap_request"]
 
 import time
+
 from cloudscraper.exceptions import CloudflareChallengeError
+
 
 def wrap_request(func, *args, count: int = 5):
     """
@@ -30,11 +32,15 @@ def wrap_request(func, *args, count: int = 5):
 
         except CloudflareChallengeError as e:
             errors.append(e)
-            print(f"Intento {attempt+1}/{count} fallido por Cloudflare, reintentando en 5 segundos...")
+            print(
+                f"Intento {attempt + 1}/{count} fallido por Cloudflare, reintentando en 5 segundos..."
+            )
         except Exception as e:
             errors.append(e)
-            print(f"Intento {attempt+1}/{count} fallido: {e}, reintentando en 5 segundos...")
-        
+            print(
+                f"Intento {attempt + 1}/{count} fallido: {e}, reintentando en 5 segundos..."
+            )
+
         time.sleep(5)  # Espera antes de reintentar
 
     raise Exception(f"Fallaron {count} intentos consecutivos. Errores: {errors}")
