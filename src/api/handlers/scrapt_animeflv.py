@@ -1,3 +1,15 @@
+#!/usr/bin/env python3
+"""
+Author : Fernando Corrales <fscpython@gmail.com>
+Date   : 19-mar-2025
+Purpose: Scrapt AnimeFlv
+Source : https://medium.com/@jackcloudman/extrayendo-datos-de-animeflv-con-python-y-scrapy-1e76f6b3ff0f
+Obs    : NOT TESTED / IMPLEMENTED YET
+"""
+
+__all__ = ["AnimeSpider"]
+
+import argparse
 import json
 import re
 
@@ -8,13 +20,50 @@ from elasticsearch import Elasticsearch
 from js2xml.utils.vars import get_vars
 from scrapy.crawler import CrawlerProcess
 
+from ..config import BASE_URL
 
+
+# --------------------------------------------------
+def get_args():
+    """Get command-line arguments"""
+
+    parser = argparse.ArgumentParser(
+        description="""Scrapes AnimeFLV for anime data.
+
+            This script uses Scrapy to extract anime data from AnimeFLV.
+
+            Example usage:
+                python -m src.api.handlers.scrapt_animeflv
+        """,
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
+
+    return parser.parse_args()
+
+
+# --------------------------------------------------
 class AnimeSpider(scrapy.Spider):
+    """
+    A Scrapy spider for scraping anime data from AnimeFLV.
+
+    This spider extracts anime data from AnimeFLV, including titles, descriptions, genres, and episode information.
+
+    Attributes:
+        name (str): The name of the spider.
+        base_url (str): The base URL of AnimeFLV.
+        es (Elasticsearch): An Elasticsearch client for storing scraped data.
+    """
     name = "AnimeSpider"
-    base_url = "https://animeflv.net/"
+    base_url = BASE_URL
     es = Elasticsearch(hosts="localhost")
 
     def start_requests(self):
+        """
+        Starts the scraping process by sending a request to the AnimeFLV homepage.
+
+        Yields:
+            scrapy.Request: A request to the AnimeFLV homepage.
+        """
         url = self.base_url + "browse?order=added"
         token, agent = cfscrape.get_tokens(url=url)
         self.token = token
@@ -24,6 +73,17 @@ class AnimeSpider(scrapy.Spider):
         )
 
     def parse(self, response):
+        """
+        Parses the HTML response from the AnimeFLV homepage.
+
+        Extracts anime data from the page, including titles, descriptions, genres, and episode information.
+
+        Args:
+            response (scrapy.Response): The HTML response from the AnimeFLV homepage.
+
+        Yields:
+            dict: A dictionary containing the extracted anime data.
+        """
         for a in response.xpath('.//article[@class="Anime alt B"]'):
             name = a.xpath(".//a/@href").extract_first()
             yield response.follow(
@@ -42,6 +102,15 @@ class AnimeSpider(scrapy.Spider):
             )
 
     def AnimeData(self, res):
+        """
+        Processes the extracted anime data and stores it in Elasticsearch.
+
+        Args:
+            res (dict): A dictionary containing the extracted anime data.
+
+        Returns:
+            None
+        """
         data = {}
         data["id"] = int(re.findall("\/[0-9]+\/", res.request.url)[0][1:-1])
         data["rating"] = float(
@@ -98,6 +167,21 @@ class AnimeSpider(scrapy.Spider):
                 f.write(str(e))
 
 
-proc = CrawlerProcess()
-proc.crawl(AnimeSpider)
-proc.start()
+# --------------------------------------------------
+def main():
+    """Make a jazz noise here"""
+
+    try:
+        proc = CrawlerProcess()
+        proc.crawl(AnimeSpider)
+        proc.start()
+    except Exception as e:
+        print(e)
+
+
+# --------------------------------------------------
+if __name__ == "__main__":
+    main()
+
+    # python -m src.api.handlers.scrapt_animeflv
+
