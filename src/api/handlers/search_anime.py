@@ -96,5 +96,5 @@ def main():
 if __name__ == "__main__":
     main()
 
-    # python -m src.api.handlers.search "Dragon Ball Z"
-    # python -m src.api.handlers.search "One Piece"
+    # python -m src.api.handlers.search_anime "Dragon Ball Z"
+    # python -m src.api.handlers.search_anime "One Piece"
