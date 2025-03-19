@@ -1,7 +1,7 @@
-__all__ = ["removeprefix"]
+__all__ = ["remove_prefix"]
 
 
-def removeprefix(str: str, prefix: str) -> str:
+def remove_prefix(str: str, prefix: str) -> str:
     """
     Remove the prefix of a given string if it contains that
     prefix for compatability with Python >3.9

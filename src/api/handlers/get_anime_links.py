@@ -17,7 +17,7 @@ from bs4 import BeautifulSoup
 
 from ..config import ANIME_VIDEO_URL
 from ..models import DownloadLinkInfo, EpisodeFormat
-from ..utils import AnimeFLVParseError, parse_table
+from ..utils import AnimeFLVParseError, parse_table, wrap_request
 from .connect import AnimeFLV
 
 
@@ -125,7 +125,9 @@ def main():
 
     with AnimeFLV() as api:
         try:
-            results = get_links(args.anime_id, str(args.episode), animeflv=api)
+            results = wrap_request(
+                lambda: get_links(args.anime_id, str(args.episode), animeflv=api)
+            )
             for result in results:
                 print(f"{result.server} - {result.url}")
         except Exception as e:

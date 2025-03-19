@@ -9,15 +9,13 @@ Source : https://github.com/jorgeajimenezl/animeflv-api
 __all__ = ["get_latest_animes"]
 
 import argparse
-import re
-from typing import List, Union
-from urllib.parse import unquote
+from typing import List
 
 from bs4 import BeautifulSoup
 
 from ..config import BASE_URL
 from ..models import AnimeInfo
-from ..utils import AnimeFLVParseError, process_anime_list_info
+from ..utils import AnimeFLVParseError, process_anime_list_info, wrap_request
 from .connect import AnimeFLV
 
 
@@ -75,13 +73,13 @@ def get_latest_animes(animeflv: AnimeFLV = None) -> List[AnimeInfo]:
 def main():
     """Make a jazz noise here"""
 
-    args = get_args()
-
     with AnimeFLV() as api:
         try:
-            results = get_latest_animes(animeflv=api)
+            results = wrap_request(lambda: get_latest_animes(animeflv=api))
             for result in results:
-                print(f"{result.id} - Title: {result.title} - Synopsis: {result.synopsis}")
+                print(
+                    f"{result.id} - Title: {result.title} - Synopsis: {result.synopsis}"
+                )
         except Exception as e:
             print(e)
 
@@ -91,4 +89,3 @@ if __name__ == "__main__":
     main()
 
     # python -m src.api.handlers.get_latest_animes
-

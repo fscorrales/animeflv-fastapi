@@ -9,15 +9,13 @@ Source : https://github.com/jorgeajimenezl/animeflv-api
 __all__ = ["get_latest_episodes"]
 
 import argparse
-import re
-from typing import List, Union
-from urllib.parse import unquote
+from typing import List
 
 from bs4 import BeautifulSoup
 
 from ..config import BASE_URL
 from ..models import EpisodeInfo
-from ..utils import AnimeFLVParseError
+from ..utils import AnimeFLVParseError, remove_prefix, wrap_request
 from .connect import AnimeFLV
 
 
@@ -71,7 +69,7 @@ def get_latest_episodes(animeflv: AnimeFLV = None) -> List[EpisodeInfo]:
             ret.append(
                 EpisodeInfo(
                     id=id,
-                    anime=removeprefix(anime, "/ver/"),
+                    anime=remove_prefix(anime, "/ver/"),
                     image_preview=f"{BASE_URL}{element.select_one('span.Image img').get('src')}",
                 )
             )
@@ -85,11 +83,9 @@ def get_latest_episodes(animeflv: AnimeFLV = None) -> List[EpisodeInfo]:
 def main():
     """Make a jazz noise here"""
 
-    args = get_args()
-
     with AnimeFLV() as api:
         try:
-            results = get_latest_episodes(animeflv=api)
+            results = wrap_request(lambda: get_latest_episodes(animeflv=api))
             for result in results:
                 print(f"{result.id} - {result.anime}")
         except Exception as e:
@@ -101,4 +97,3 @@ if __name__ == "__main__":
     main()
 
     # python -m src.api.handlers.get_latest_episodes
-

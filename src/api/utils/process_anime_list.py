@@ -6,7 +6,7 @@ from bs4 import ResultSet
 
 from ..models import AnimeInfo
 from .exceptions import AnimeFLVParseError
-from .remove_prefix import removeprefix
+from .remove_prefix import remove_prefix
 
 
 # --------------------------------------------------
@@ -17,7 +17,7 @@ def process_anime_list_info(elements: ResultSet) -> List[AnimeInfo]:
         try:
             ret.append(
                 AnimeInfo(
-                    id=removeprefix(
+                    id=remove_prefix(
                         element.select_one("div.Description a.Button")["href"][1:],
                         "anime/",
                     ),

@@ -90,7 +90,7 @@ def main():
 
     with AnimeFLV() as api:
         try:
-            elements = wrap_request(search(args.title, animeflv=api))
+            elements = wrap_request(lambda: search(args.title, animeflv=api))
             for i, element in enumerate(elements):
                 print(f"{i}, id: {element.id}, title: {element.title}")
         except Exception as e:

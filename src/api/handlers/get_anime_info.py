@@ -15,7 +15,7 @@ from bs4 import BeautifulSoup
 
 from ..config import ANIME_URL, BASE_EPISODE_IMG_URL, BASE_URL
 from ..models import AnimeInfo, EpisodeInfo
-from ..utils import AnimeFLVParseError
+from ..utils import AnimeFLVParseError, wrap_request
 from .connect import AnimeFLV
 
 
@@ -148,7 +148,7 @@ def main():
 
     with AnimeFLV() as api:
         try:
-            anime = get_anime_info(args.anime_id, animeflv=api)
+            anime = wrap_request(lambda: get_anime_info(args.anime_id, animeflv=api))
             print(f"Título: {anime.title}")
             print(f"Sinopsis: {anime.synopsis}")
             print(f"Tipo: {anime.type}")
