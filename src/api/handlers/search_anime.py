@@ -6,6 +6,8 @@ Purpose: Try search in AnimeFlv API
 Source : https://github.com/jorgeajimenezl/animeflv-api
 """
 
+__all__ = ["search"]
+
 import argparse
 from typing import List
 from urllib.parse import urlencode

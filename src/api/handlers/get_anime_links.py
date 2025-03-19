@@ -2,9 +2,11 @@
 """
 Author : Fernando Corrales <fscpython@gmail.com>
 Date   : 18-mar-2025
-Purpose: Try get_anime_links in AnimeFlv API
+Purpose: Try get_links in AnimeFlv API
 Source : https://github.com/jorgeajimenezl/animeflv-api
 """
+
+__all__ = ["get_links"]
 
 import argparse
 import re

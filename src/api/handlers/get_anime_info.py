@@ -6,6 +6,8 @@ Purpose: Try get_anime_info in AnimeFlv API
 Source : https://github.com/jorgeajimenezl/animeflv-api
 """
 
+__all__ = ["get_anime_info"]
+
 import argparse
 import json
 
