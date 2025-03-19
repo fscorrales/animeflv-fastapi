@@ -25,10 +25,13 @@ def get_args():
     """Get command-line arguments"""
 
     parser = argparse.ArgumentParser(
-        description="""
-        Función de búsqueda para la API de AnimeFlv. 
-        Permite buscar series de anime en el sitio web de AnimeFlv y devuelve 
-        los resultados en forma de lista de elementos
+        description="""Busca animes en la API de AnimeFLV.
+
+            Este script toma un término de búsqueda como entrada y devuelve una lista
+            de animes que coinciden con el término de búsqueda.
+
+            Example usage:
+                python -m src.api.handlers.search_anime one-piece
         """,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
