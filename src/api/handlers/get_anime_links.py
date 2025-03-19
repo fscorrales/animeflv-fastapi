@@ -68,20 +68,19 @@ def get_links(
     **kwargs,
 ) -> List[DownloadLinkInfo]:
     """
-    Get download links of specific episode.
-    Return a list of dictionaries like:
-    [
-        {
-            "server": "...",
-            "url": "..."
-        },
-        ...
-    ]
+    Retrieves a list of links for a specific anime from the AnimeFLV API.
 
-    :param id: Anime id, like as 'nanatsu-no-taizai'.
-    :param episode: Episode id, like as '1'.
-    :param **kwargs: Optional arguments for filter output (see doc).
-    :rtype: list
+    This function fetches a list of links for an anime, including links to episodes and other related content.
+
+    Args:
+        anime_id (str): The ID of the anime to retrieve links for.
+        animeflv (AnimeFLV, optional): An instance of AnimeFLV. Defaults to None.
+
+    Returns:
+        List[Link]: A list of Link objects containing links to episodes and other related content.
+
+    Raises:
+        AnimeFLVParseError: If the parsing of the AnimeFLV page fails.
     """
 
     if animeflv is None:
