@@ -24,8 +24,12 @@ def get_args():
     """Get command-line arguments"""
 
     parser = argparse.ArgumentParser(
-        description="""
-        Obtiene información sobre un anime específico desde la API de AnimeFLV.
+        description="""Fetches information about a specific anime from the AnimeFLV API.
+
+            This script retrieves information about an anime, including title, description, genres, and episodes.
+
+            Example usage:
+                python -m src.api.handlers.get_anime_info one-piece-tv
         """,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
@@ -44,11 +48,19 @@ def get_args():
 # --------------------------------------------------
 def get_anime_info(id: str, animeflv: AnimeFLV) -> AnimeInfo:
     """
-    Get information about specific anime.
-    Return a dictionary.
+    Retrieves information about a specific anime from the AnimeFLV API.
 
-    :param id: Anime id, like as 'nanatsu-no-taizai'.
-    :rtype: dict
+    This function fetches information about an anime, including title, description, genres, and episodes.
+
+    Args:
+        anime_id (str): The ID of the anime to retrieve information about.
+        animeflv (AnimeFLV, optional): An instance of AnimeFLV. Defaults to None.
+
+    Returns:
+        AnimeInfo: An AnimeInfo object containing information about the anime.
+
+    Raises:
+        AnimeFLVParseError: If the parsing of the AnimeFLV page fails.
     """
 
     if animeflv is None:
