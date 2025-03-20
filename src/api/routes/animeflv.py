@@ -1,13 +1,13 @@
-from fastapi import APIRouter
-
 from typing import List
 
-from ..services import AnimeFLVService
+from fastapi import APIRouter
+
 from ..models import LatestAnimes
+from ..services import AnimeFLVServiceDependency
 
 animeflv_router = APIRouter(prefix="/animeflv", tags=["AnimeFLV"])
 
 
 @animeflv_router.get("/latest_animes")
-async def latest_animes(animeflv: AnimeFLVService, response_model: None):
+def latest_animes(animeflv: AnimeFLVServiceDependency):
     return animeflv.get_latest_animes()

@@ -4,17 +4,18 @@ from typing import Annotated, List
 
 from fastapi import Depends
 
+from ..config import logger
 from ..handlers import get_latest_animes
 from ..models import LatestAnimes
-from ..config import logger
+from ..utils import wrap_request
 
 
 class AnimeFLVService:
     @classmethod
-    async def get_latest_animes(cls) -> List[LatestAnimes]:
+    def get_latest_animes(cls) -> List[LatestAnimes]:
         try:
-            results = await wrap_request(lambda: get_latest_animes())
             anime_list = []
+            results = wrap_request(lambda: get_latest_animes())
             for result in results:
                 anime_list.append(
                     LatestAnimes(
