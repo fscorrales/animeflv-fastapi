@@ -13,7 +13,7 @@ import argparse
 import json
 import re
 
-import cfscrape
+import cloudscraper
 import js2xml
 import scrapy
 from elasticsearch import Elasticsearch
@@ -53,6 +53,7 @@ class AnimeSpider(scrapy.Spider):
         base_url (str): The base URL of AnimeFLV.
         es (Elasticsearch): An Elasticsearch client for storing scraped data.
     """
+
     name = "AnimeSpider"
     base_url = BASE_URL
     es = Elasticsearch(hosts="localhost")
@@ -65,11 +66,13 @@ class AnimeSpider(scrapy.Spider):
             scrapy.Request: A request to the AnimeFLV homepage.
         """
         url = self.base_url + "browse?order=added"
-        token, agent = cfscrape.get_tokens(url=url)
-        self.token = token
-        self.agent = agent
+        scraper = cloudscraper.create_scraper()
+        response = scraper.get(url)
         yield scrapy.Request(
-            url=url, callback=self.parse, cookies=token, headers={"User-Agent": agent}
+            url=url,
+            callback=self.parse,
+            cookies=response.cookies,
+            headers=response.headers,
         )
 
     def parse(self, response):
@@ -184,4 +187,3 @@ if __name__ == "__main__":
     main()
 
     # python -m src.api.handlers.scrapt_animeflv
-
