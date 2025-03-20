@@ -1,7 +1,7 @@
-# from fastapi import FastAPI
-# from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 
-# from .siif.routes import siif_router
+from .api.routes import animeflv_router
 
 # # tags_metadata = [
 # #     {"name": "Auth"},
@@ -10,21 +10,19 @@
 # # ]
 
 # # app = FastAPI(title="Final Project API", openapi_tags=tags_metadata)
-# app = FastAPI(title="Final Project API")
+app = FastAPI(title="AnimeFLV API")
 
-# # Include our API routes
-# app.include_router(siif_router)
-# # # Let's include our auth routes aside from the API routes
-# # app.include_router(auth_router)
+# Include our API routes
+app.include_router(animeflv_router)
 
 
-# # Set up CORS middleware
-# app.add_middleware(
-#     CORSMiddleware,
-#     allow_origins=["*"],
-#     allow_credentials=True,
-#     allow_methods=["*"],
-#     allow_headers=["*"],
-# )
+# Set up CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # # uvicorn src.main:app --loop asyncio
