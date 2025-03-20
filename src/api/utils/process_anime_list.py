@@ -4,6 +4,7 @@ from typing import List
 
 from bs4 import ResultSet
 
+from ..config import BASE_URL
 from ..models import AnimeInfo
 from .exceptions import AnimeFLVParseError
 from .remove_prefix import remove_prefix
@@ -22,7 +23,8 @@ def process_anime_list_info(elements: ResultSet) -> List[AnimeInfo]:
                         "anime/",
                     ),
                     title=element.select_one("a h3").string,
-                    poster=(
+                    poster=BASE_URL
+                    + (
                         element.select_one("a div.Image figure img").get("src", None)
                         or element.select_one("a div.Image figure img")["data-cfsrc"]
                     ),

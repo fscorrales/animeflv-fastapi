@@ -1,4 +1,10 @@
-__all__ = ["AnimeInfo", "EpisodeInfo", "EpisodeFormat", "DownloadLinkInfo", "LatestAnimes"]
+__all__ = [
+    "AnimeInfo",
+    "EpisodeInfo",
+    "EpisodeFormat",
+    "DownloadLinkInfo",
+    "LatestAnimes",
+]
 
 from enum import Flag, auto
 from typing import List, Optional, Union
@@ -36,7 +42,12 @@ class DownloadLinkInfo(BaseModel):
     server: str
     url: str
 
+
 class LatestAnimes(BaseModel):
     id: str
     title: str
     synopsis: str = None
+    poster: str = None
+    type: str = None
+    rating: str = None
+    debut: str = None

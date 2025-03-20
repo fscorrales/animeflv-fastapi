@@ -22,6 +22,10 @@ class AnimeFLVService:
                         id=result.id,
                         title=result.title,
                         synopsis=result.synopsis,
+                        poster=result.poster,
+                        type=result.type,
+                        rating=result.rating,
+                        debut=result.debut,
                     )
                 )
         except Exception as e:
