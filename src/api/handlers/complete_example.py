@@ -8,8 +8,9 @@ Idea   : https://www.youtube.com/shorts/7uZL7idkqJ0?si=GhxmCY67Kfk4nRAi
 """
 
 import argparse
-from . import AnimeFLV, search, get_anime_info, get_anime_links
-from .utils import wrap_request
+
+from ..utils import wrap_request
+from . import AnimeFLV, get_anime_info, get_links, search
 
 
 # --------------------------------------------------
@@ -29,14 +30,16 @@ def main():
     """Make a jazz noise here"""
 
     with AnimeFLV() as api:
-        # elements = api.search(input("Serie to search: "))
-        elements = wrap_request(lambda: search(input("Serie to search: "), animeflv=api))
-        for i, element in enumerate(elements):
-                print(f"{i}, id: {element.id}, title: {element.title}")
         try:
+            # elements = api.search(input("Serie to search: "))
+            serie = input("Serie to search: ")
+            elements = wrap_request(lambda: search(serie, animeflv=api))
+            for i, element in enumerate(elements):
+                print(f"{i}, id: {element.id}, title: {element.title}")
             selection = int(input("Select option: "))
+            serie = elements[selection].id
             # info = api.get_anime_info(elements[selection])
-            info = wrap_request(lambda: get_anime_info(elements[selection], animeflv=api))
+            info = wrap_request(lambda: get_anime_info(serie, animeflv=api))
             print(f"Título: {info.title}")
             print(f"Sinopsis: {info.synopsis}")
             print(f"Tipo: {info.type}")
@@ -48,12 +51,9 @@ def main():
             for j, episode in enumerate(info.episodes):
                 print(f"{j}, | Episode - {episode.id}")
             index_episode = int(input("Select episode: "))
-            serie = elements[selection].id
             capitulo = info.episodes[index_episode].id
             # results = api.get_links(serie, capitulo)
-            results = wrap_request(
-                lambda: get_links(serie, capitulo, animeflv=api)
-            )
+            results = wrap_request(lambda: get_links(serie, capitulo, animeflv=api))
             for result in results:
                 print(f"{result.server} - {result.url}")
         except Exception as e:
@@ -64,4 +64,4 @@ def main():
 if __name__ == "__main__":
     main()
 
-    # python -m src.handlers.complete_example
+    # python -m src.api.handlers.complete_example
