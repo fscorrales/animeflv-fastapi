@@ -1,9 +1,10 @@
 __all__ = [
+    "BaseAnimeInfo",
+    "FullAnimeInfo",
     "AnimeInfo",
     "EpisodeInfo",
     "EpisodeFormat",
     "DownloadLinkInfo",
-    "LatestAnimes",
 ]
 
 from enum import Flag, auto
@@ -17,6 +18,22 @@ class EpisodeInfo(BaseModel):
     id: Union[str, int]
     anime: str
     image_preview: Optional[str] = None
+
+
+class BaseAnimeInfo(BaseModel):
+    id: Union[str, int]
+    title: str
+    poster: Optional[str] = None
+    banner: Optional[str] = None
+    synopsis: Optional[str] = None
+    rating: Optional[str] = None
+    debut: Optional[str] = None
+    type: Optional[str] = None
+
+
+class FullAnimeInfo(BaseAnimeInfo):
+    genres: List[str]
+    episodes: List[EpisodeInfo] 
 
 
 # --------------------------------------------------
@@ -41,13 +58,3 @@ class EpisodeFormat(Flag):
 class DownloadLinkInfo(BaseModel):
     server: str
     url: str
-
-
-class LatestAnimes(BaseModel):
-    id: str
-    title: str
-    synopsis: str = None
-    poster: str = None
-    type: str = None
-    rating: str = None
-    debut: str = None
