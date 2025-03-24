@@ -20,13 +20,12 @@ def get_args():
     """Get command-line arguments"""
 
     parser = argparse.ArgumentParser(
-        description="""Fetches the latest anime releases from AnimeFLV.
-
-            This script retrieves a list of the most recent anime releases
-            from AnimeFLV.
-
-            Example usage:
-                python -m src.api.handlers.get_latest_animes
+        description="""This script retrieves the real video URL from a given platform (e.g., YouTube, Twitter, TikTok, etc.) 
+        using yt-dlp. It supports platforms like YouTube, Twitter, Instagram, and other streaming services. 
+        This is useful for downloading or extracting direct video links from websites that provide streaming content.
+        
+        Example usage:
+            python -m src.api.handlers.get_real_video_url "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
         """,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
@@ -34,7 +33,7 @@ def get_args():
     parser.add_argument(
         "url",
         metavar="str",
-        help="A URL to get the real video URL",
+        help="The URL of the video page from which to extract the real video URL.",
         type=str,
     )
 
