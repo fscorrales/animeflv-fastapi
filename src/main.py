@@ -3,14 +3,23 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .api.routes import animeflv_router
 
-# # tags_metadata = [
-# #     {"name": "Auth"},
-# #     {"name": "Users"},
-# #     {"name": "Products"},
-# # ]
+# Create a FastAPI instance
+app = FastAPI(
+    title="AnimeFLV FastAPI",
+    description="""
+    FastAPI version of animeflv-api for animeflv.net.  
+    """,
+    contact={
+        "name": "GitHub Repository",
+        "url": "https://github.com/fscorrales/animeflv-fastapi",
+    },
+    license_info={
+        "name": "MIT License",
+        "url": "https://opensource.org/licenses/MIT",
+    },
+    version="1.0.0",
+)
 
-# # app = FastAPI(title="Final Project API", openapi_tags=tags_metadata)
-app = FastAPI(title="AnimeFLV API")
 
 # Include our API routes
 app.include_router(animeflv_router)
